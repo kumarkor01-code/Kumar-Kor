@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KUMAR GAME - PREMIUM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -22,7 +22,8 @@
             background-color: #111827; width: 90%; max-width: 400px; padding: 30px; 
             border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #1f2937; text-align: center;
         }
-        h1 { color: #ffffff; font-size: 26px; margin-bottom: 5px; letter-spacing: 1px; }
+        
+        h1 { color: #ffffff; font-size: 26px; margin-bottom: 5px; letter-spacing: 1px; font-weight: 800; }
         h1 span { color: #fbbf24; }
         p.subtitle { color: #9ca3af; font-size: 12px; margin-bottom: 25px; }
         
@@ -31,27 +32,52 @@
             width: 100%; padding: 12px; background-color: #1f2937; border: 1px solid #374151; 
             border-radius: 10px; color: white; font-size: 14px; outline: none;
         }
-        input:focus { border-color: #fbbf24; }
+        input:focus { border-color: #fbbf24; box-shadow: 0 0 5px rgba(251, 191, 36, 0.5); }
         
         .btn { 
             width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
             cursor: pointer; transition: 0.3s; margin-top: 20px;
         }
         .btn-gold { background: linear-gradient(to right, #f59e0b, #fbbf24); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
-        .btn-gold:hover { transform: translateY(-2px); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6); }
         .btn-dark { background-color: #1f2937; border: 1px solid #374151; color: #fbbf24; margin-top: 10px;}
         .btn-dark:hover { background-color: #374151; }
-        .btn-danger { background-color: #ef4444; color: white; margin-top: 10px;}
+        .btn-danger { background-color: #ef4444; color: white; margin-top: 10px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);}
+        .btn-danger:hover { background-color: #dc2626; }
         
-        .link-text { color: #fbbf24; font-size: 12px; cursor: pointer; margin-top: 20px; display: block; }
+        .link-text { color: #fbbf24; font-size: 13px; cursor: pointer; margin-top: 20px; display: block; font-weight: 600; }
+        .link-text:hover { text-decoration: underline; }
+
+        /* Dashboard Premium Styles */
+        .dashboard-header { background: #1f2937; padding: 15px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #374151; }
+        .user-greeting { font-size: 18px; font-weight: 700; color: #fff; margin: 0; }
+        .user-greeting span { color: #fbbf24; }
+        .coin-display { font-size: 20px; font-weight: 800; color: #fbbf24; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         
-        /* Updated Board Design */
-        .board { display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; margin-top: 30px; margin-bottom: 30px; }
+        /* Game Board Styles */
+        .board-wrapper { position: relative; display: inline-block; margin-top: 20px; margin-bottom: 20px; }
+        .board { display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; }
         .cell { 
             width: 80px; height: 80px; background: #1f2937; 
             font-size: 45px; font-weight: bold; display: flex; align-items: center; justify-content: center; 
             border-radius: 15px; cursor: pointer; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: 0.2s;
         }
+        .cell:active { transform: scale(0.95); }
+
+        /* Winning Line Setup */
+        .win-line { 
+            position: absolute; background-color: #10b981; border-radius: 10px; 
+            z-index: 10; display: none; transition: 0.3s; box-shadow: 0 0 10px #10b981;
+        }
+        .line-row-0 { top: 13%; left: 2%; width: 96%; height: 6px; }
+        .line-row-1 { top: 48%; left: 2%; width: 96%; height: 6px; }
+        .line-row-2 { top: 84%; left: 2%; width: 96%; height: 6px; }
+        .line-col-0 { left: 14%; top: 2%; height: 96%; width: 6px; }
+        .line-col-1 { left: 48%; top: 2%; height: 96%; width: 6px; }
+        .line-col-2 { left: 84%; top: 2%; height: 96%; width: 6px; }
+        .line-diag-0 { top: 48%; left: -10%; width: 120%; height: 6px; transform: rotate(45deg); }
+        .line-diag-1 { top: 48%; left: -10%; width: 120%; height: 6px; transform: rotate(-45deg); }
         
         .screen { display: none; }
         .active-screen { display: block; }
@@ -86,9 +112,8 @@
         <p class="subtitle">Create your secure account</p>
         
         <input type="text" id="regName" placeholder="Full Name" style="margin-bottom: 10px;">
-        <input type="number" id="regPhone" placeholder="Phone Number" style="margin-bottom: 10px;">
-        <input type="password" id="regPass" placeholder="Password" style="margin-bottom: 10px;">
-        <input type="number" id="regPin" placeholder="4-Digit PIN" style="margin-bottom: 10px;">
+        <input type="password" id="regPass" placeholder="Create Password" style="margin-bottom: 10px;">
+        <input type="number" id="regPin" placeholder="Create 4-Digit PIN" style="margin-bottom: 10px;">
         <input type="number" id="regTgId" placeholder="Telegram Chat ID (Important)">
         
         <button class="btn btn-dark" onclick="window.open('https://t.me/Kumarotpbot', '_blank')">✈️ Start bot first to get OTP</button>
@@ -104,8 +129,10 @@
 
     <!-- 3. DASHBOARD SCREEN -->
     <div class="container screen" id="homeScreen">
-        <h1>DASHBOARD</h1>
-        <p class="subtitle" id="welcomeText">Welcome!</p>
+        <div class="dashboard-header">
+            <p class="user-greeting">Welcome, <span id="welcomeName">Player</span>!</p>
+            <div class="coin-display">🪙 <span id="coinCount">0</span> Coins</div>
+        </div>
         
         <button class="btn btn-gold" onclick="showScreen('oxModeScreen')">🎮 PLAY OX GAME</button>
         <button class="btn btn-dark" onclick="showScreen('ludoModeScreen')">🎲 PLAY LUDO</button>
@@ -115,8 +142,8 @@
     <!-- 4. OX MODE SELECTION -->
     <div class="container screen" id="oxModeScreen">
         <h1>OX <span>MODE</span></h1>
-        <button class="btn btn-gold" onclick="findOnlineMatch()">👤 User vs User (Online)</button>
-        <button class="btn btn-dark" onclick="startLocalGame('ai')">🤖 User vs AI (Offline)</button>
+        <button class="btn btn-gold" onclick="findOnlineMatch()">👤 User vs User (Win Coins)</button>
+        <button class="btn btn-dark" onclick="startLocalGame('ai')">🤖 User vs Super AI</button>
         <button class="btn btn-danger" onclick="showScreen('homeScreen')">⬅ Back</button>
     </div>
 
@@ -141,13 +168,19 @@
     <div class="container screen" id="gameScreen">
         <h1>OX <span>GAME</span></h1>
         <p class="subtitle" id="gameStatus">Player X's Turn</p>
-        <div class="board" id="board"></div>
+        
+        <div class="board-wrapper">
+            <div id="winLine" class="win-line"></div>
+            <div class="board" id="board"></div>
+        </div>
+
         <button class="btn btn-gold" id="playAgainBtn" onclick="resetLocalGame()">🔄 Play Again</button>
-        <button class="btn btn-dark" onclick="leaveGame()">🏠 Home</button>
+        <button class="btn btn-dark" onclick="leaveGame()">🏠 Home to Dashboard</button>
     </div>
 
     <script>
         // ==========================================
+        // 🚨 REPLACE WITH YOUR ACTUAL KEYS 🚨
         const BOT_TOKEN = "8861473974:AAENTh2kYJbApxH8JFTsURJkDeYoixm8mtg"; 
         const firebaseConfig = {
             apiKey: "AIzaSyC8umQwCdC9EJ7rbOxI1MKik4L9SNvAIBw", 
@@ -163,7 +196,9 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         let generatedOTP = null;
-        let currentUser = null;
+        let currentUserTgId = null;
+        let currentUserName = "Player";
+        let currentUserCoins = 0;
         let matchInterval = null;
 
         function showScreen(screenId) {
@@ -181,8 +216,10 @@
                 if(snapshot.exists()) {
                     let data = snapshot.val();
                     if(data.password === pass) {
-                        currentUser = id;
-                        document.getElementById('welcomeText').innerText = "Welcome, " + data.name + "!";
+                        currentUserTgId = id;
+                        currentUserName = data.name;
+                        currentUserCoins = data.coins || 0;
+                        updateDashboard();
                         showScreen('homeScreen');
                     } else { alert("❌ Incorrect Password!"); }
                 } else { alert("❌ Account not found. Please create a new account."); }
@@ -207,14 +244,14 @@
         function verifyAndRegister() {
             let otp = document.getElementById("regOtpInput").value;
             let name = document.getElementById("regName").value;
-            let phone = document.getElementById("regPhone").value;
             let pass = document.getElementById("regPass").value;
             let pin = document.getElementById("regPin").value;
             let tgId = document.getElementById("regTgId").value;
 
             if(otp == generatedOTP) {
+                // Initialize user with 0 coins
                 database.ref('users/' + tgId).set({
-                    name: name, phone: phone, password: pass, pin: pin, tgId: tgId
+                    name: name, password: pass, pin: pin, tgId: tgId, coins: 0
                 });
                 alert("✅ Account Created Successfully! Please login.");
                 showScreen('loginScreen');
@@ -222,13 +259,18 @@
         }
 
         function logout() {
-            currentUser = null;
+            currentUserTgId = null;
             document.getElementById('loginId').value = "";
             document.getElementById('loginPass').value = "";
             showScreen('loginScreen');
         }
 
-        // --- MATCHMAKING (1 Min Timer) ---
+        function updateDashboard() {
+            document.getElementById('welcomeName').innerText = currentUserName;
+            document.getElementById('coinCount').innerText = currentUserCoins;
+        }
+
+        // --- MATCHMAKING ---
         function findOnlineMatch() {
             showScreen('waitingScreen');
             let timeLeft = 60;
@@ -244,14 +286,14 @@
                 }
             }, 1000);
 
-            // Mock Online Match Logic (Since we need a complex backend for true P2P, this simulates the wait)
+            // Simulation of finding a player
             setTimeout(() => {
                 if(document.getElementById('waitingScreen').classList.contains('active-screen')) {
                     clearInterval(matchInterval);
-                    alert("Simulated: Player Found! Starting Game...");
-                    startLocalGame('ai'); // Starting AI as a placeholder for actual P2P connection logic
+                    alert("Player Found! Starting Game...");
+                    startLocalGame('user'); // Simulates P2P
                 }
-            }, Math.floor(Math.random() * 10000) + 5000); // Random wait time 5-15s for demo
+            }, Math.floor(Math.random() * 6000) + 3000); 
         }
 
         function cancelMatchmaking() {
@@ -259,17 +301,23 @@
             showScreen('oxModeScreen');
         }
 
-        // --- OX GAME LOGIC ---
+        // --- OX GAME LOGIC (SUPER AI & WINNING LINE) ---
         let board = ["", "", "", "", "", "", "", "", ""];
         let currentPlayer = "X";
         let gameMode = "ai";
         let gameActive = true;
+        let isWaitingForAI = false; // Prevent fast clicking
         const boardEl = document.getElementById("board");
         const statusEl = document.getElementById("gameStatus");
+        const winLine = document.getElementById("winLine");
+        const winningConditions = [
+            [0, 1, 2, 'line-row-0'], [3, 4, 5, 'line-row-1'], [6, 7, 8, 'line-row-2'], 
+            [0, 3, 6, 'line-col-0'], [1, 4, 7, 'line-col-1'], [2, 5, 8, 'line-col-2'], 
+            [0, 4, 8, 'line-diag-0'], [2, 4, 6, 'line-diag-1']
+        ];
 
         function startLocalGame(mode) {
             gameMode = mode;
-            document.getElementById('playAgainBtn').style.display = 'block';
             showScreen('gameScreen');
             resetLocalGame();
         }
@@ -284,64 +332,109 @@
                 let cell = document.createElement("div");
                 cell.className = "cell";
                 cell.innerText = val;
-                if(val === "X") cell.style.color = "#ef4444"; // Red for X
-                if(val === "O") cell.style.color = "#3b82f6"; // Blue for O
+                if(val === "X") cell.style.color = "#ef4444"; 
+                if(val === "O") cell.style.color = "#3b82f6"; 
                 cell.onclick = () => play(i);
                 boardEl.appendChild(cell);
             });
         }
 
         function play(i) {
-            if (board[i] === "" && gameActive) {
+            // Prevent fast clicking bugs
+            if (board[i] === "" && gameActive && !isWaitingForAI) {
                 board[i] = currentPlayer;
-                checkWinOrDraw();
+                let result = checkWinOrDraw();
+                
                 if (gameActive && gameMode === 'ai' && currentPlayer === "O") {
-                    setTimeout(aiMove, 600);
+                    isWaitingForAI = true;
+                    statusEl.innerText = "🤖 Super AI is thinking...";
+                    setTimeout(() => {
+                        aiMove();
+                        isWaitingForAI = false;
+                    }, 500);
                 }
             }
         }
 
+        // --- UNBEATABLE MINIMAX AI ALGORITHM ---
         function aiMove() {
-            let emptyCells = [];
-            board.forEach((val, i) => { if(val === "") emptyCells.push(i); });
-            if(emptyCells.length > 0 && gameActive) {
-                let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                board[randomCell] = "O";
+            let bestScore = -Infinity;
+            let move;
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === "") {
+                    board[i] = "O";
+                    let score = minimax(board, 0, false);
+                    board[i] = "";
+                    if (score > bestScore) { bestScore = score; move = i; }
+                }
+            }
+            if(move !== undefined) {
+                board[move] = "O";
                 checkWinOrDraw();
             }
         }
 
+        function minimax(boardState, depth, isMaximizing) {
+            let winner = checkWinnerSilent();
+            if (winner === "O") return 10 - depth;
+            if (winner === "X") return depth - 10;
+            if (winner === "tie") return 0;
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (boardState[i] === "") {
+                        boardState[i] = "O";
+                        let score = minimax(boardState, depth + 1, false);
+                        boardState[i] = "";
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (boardState[i] === "") {
+                        boardState[i] = "X";
+                        let score = minimax(boardState, depth + 1, true);
+                        boardState[i] = "";
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        function checkWinnerSilent() {
+            for(let i=0; i<8; i++) {
+                let [a,b,c] = winningConditions[i];
+                if(board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+            }
+            return board.includes("") ? null : "tie";
+        }
+
+        // --- WIN/DRAW LOGIC & REWARDS ---
         function checkWinOrDraw() {
-            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
             let won = false;
-            for(let [a,b,c] of lines) {
+            for(let i=0; i<8; i++) {
+                let [a, b, c, lineClass] = winningConditions[i];
                 if(board[a] && board[a] === board[b] && board[a] === board[c]) {
                     statusEl.innerText = `🎉 Player ${board[a]} Wins!`;
                     statusEl.style.color = "#10b981";
-                    gameActive = false; won = true; break;
+                    
+                    // Draw Winning Line
+                    winLine.className = `win-line ${lineClass}`;
+                    winLine.style.display = "block";
+                    
+                    gameActive = false; 
+                    won = true; 
+
+                    // Reward Logic (If User 'X' wins)
+                    if(board[a] === "X") {
+                        giveReward();
+                    }
+                    break;
                 }
             }
             if(!won) {
-                if(!board.includes("")) {
-                    statusEl.innerText = "🤝 It's a Draw!";
-                    statusEl.style.color = "#9ca3af";
-                    gameActive = false;
-                } else {
-                    currentPlayer = currentPlayer === "X" ? "O" : "X";
-                    statusEl.innerText = gameMode === 'ai' && currentPlayer === 'O' ? "🤖 AI is thinking..." : `Player ${currentPlayer}'s Turn`;
-                    statusEl.style.color = "#9ca3af";
-                }
-            }
-            createBoard();
-        }
-
-        function resetLocalGame() {
-            board = ["", "", "", "", "", "", "", "", ""];
-            currentPlayer = "X"; gameActive = true;
-            statusEl.innerText = "Player X's Turn";
-            statusEl.style.color = "#9ca3af";
-            createBoard();
-        }
-    </script>
-</body>
-</html>
+   
