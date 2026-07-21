@@ -392,19 +392,32 @@
     <!-- 13. ADMIN PANEL -->
     <div class="container screen" id="adminScreen">
         <h1>👑 ADMIN <span>PANEL</span></h1>
+        
+        <!-- BAN / UNBAN SECTION -->
         <div style="background:#111; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #333; text-align:left;">
-            <h3 style="color:var(--accent-main); font-size:14px; margin-bottom:15px;">🛡️ BAN / UNBAN USER</h3>
+            <h3 style="color:var(--danger); font-size:14px; margin-bottom:15px;">🛡️ BAN / UNBAN USER</h3>
             <input type="number" id="admBanId" placeholder="User Telegram ID">
-            <button class="btn btn-danger" style="padding:10px; margin-top:5px;" onclick="adminAction('ban')">BAN</button>
-            <button class="btn btn-dark" style="padding:10px; margin-top:5px;" onclick="adminAction('unban')">UNBAN</button>
+            <button class="btn" style="background:#ef4444; color:white; padding:10px; margin-top:5px;" onclick="adminAction('ban')">BAN</button>
+            <button class="btn" style="background:#334155; color:white; padding:10px; margin-top:5px;" onclick="adminAction('unban')">UNBAN</button>
         </div>
+        
+        <!-- ADD / REMOVE COINS SECTION -->
         <div style="background:#111; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #333; text-align:left;">
-            <h3 style="color:var(--gold); font-size:14px; margin-bottom:15px;">💰 ADD / REMOVE COINS</h3>
+            <h3 style="color:#facc15; font-size:14px; margin-bottom:15px;">💰 ADD / REMOVE COINS</h3>
             <input type="number" id="admId" placeholder="Enter ID">
             <input type="number" id="admCoins" placeholder="e.g. 100 or -50">
-            <button class="btn btn-gold" onclick="adminAction('coins')">UPDATE COINS</button>
+            <button class="btn" style="background:#facc15; color:black; padding:10px; margin-top:5px; font-weight:bold;" onclick="adminAction('coins')">UPDATE COINS</button>
         </div>
-        <button class="btn btn-danger" style="margin-top:20px;" onclick="showScreen('homeScreen')">⬅ Exit Admin Panel</button>
+
+        <!-- NEW: WIN/LOSS CODE VERIFICATION SECTION -->
+        <div style="background:#111; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #333; text-align:left;">
+            <h3 style="color:#10b981; font-size:14px; margin-bottom:15px;">🔍 VERIFY WIN/LOSS CODE</h3>
+            <input type="text" id="admVerifyCode" placeholder="e.g. OX jwhxvsksn">
+            <button class="btn" style="background:#10b981; color:white; padding:10px; margin-top:5px; font-weight:bold; width:100%;" onclick="verifyGameCode()">CHECK CODE</button>
+            <div id="verifyResult" style="margin-top:15px; font-size:14px; font-weight:bold;"></div>
+        </div>
+
+        <button class="btn" style="background:#ef4444; color:white; margin-top:20px;" onclick="showScreen('homeScreen')">⬅ Exit Admin Panel</button>
     </div>
 
     <!-- 14. USER PROFILE MODAL -->
