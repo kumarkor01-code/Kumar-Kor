@@ -203,113 +203,6 @@
         </div>
         <br><span class="link-text" onclick="showScreen('loginScreen')">Back to Login</span>
     </div>
-
-    <!-- JAVASCRIPT FOR REGISTRATION & OTP -->
-    <script>
-        let generatedOTP = ""; // OTP सेव्ह ठेवण्यासाठी
-
-        // OTP पाठवणारे फंक्शन
-        async function sendOTP(actionType) {
-            if (actionType === 'register') {
-                let name = document.getElementById('regName').value.trim();
-                let pass = document.getElementById('regPass').value.trim();
-                let tgId = document.getElementById('regTgId').value.trim();
-
-                // १. माहिती रिकामी तर नाही ना हे चेक करणे
-                if (name === "" || pass === "" || tgId === "") {
-                    return alert("⚠️ Please fill all details first!");
-                }
-
-                // 🟢 २. रियल-टाईम डेटाबेस चेक करणे (बटण दाबल्यावर लगेच लेटेस्ट डेटा घेणार)
-                let currentDB = JSON.parse(localStorage.getItem("allGameUsers")) || {};
-
-                // ३. अकाउंट आधीच आहे का ते चेक करणे
-                if (currentDB[tgId]) {
-                    alert("⚠️ ACCOUNT ALREADY EXISTS!\nया टेलिग्राम आयडीवर आधीच अकाउंट आहे. कृपया लॉगीन करा.");
-                    showScreen('loginScreen'); 
-                    return; // इथूनच कोड परत फिरेल, OTP जाणार नाही!
-                }
-
-                // ४. 4-अंकी रँडम OTP तयार करणे
-                generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
-                // टोकन चेक करणे (तुझ्या कोडमध्ये botToken आधीच असायला हवा)
-                if (typeof botToken === 'undefined' || !botToken) {
-                    alert("❌ Error: Bot Token is missing in the code!");
-                    return;
-                }
-
-                const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-                let messageText = `🔐 *KUMAR GAME OTP*\n\nHello ${name},\nYour verification code is: *${generatedOTP}*\n\nDo not share this code with anyone.`;
-
-                let btn = document.getElementById('sendOtpBtn');
-                btn.innerText = "⏳ Sending...";
-
-                try {
-                    let response = await fetch(telegramApiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: tgId,
-                            text: messageText,
-                            parse_mode: "Markdown"
-                        })
-                    });
-
-                    let data = await response.json();
-
-                    if (data.ok) {
-                        alert("✅ OTP successfully sent to your Telegram Chat ID!");
-                        document.getElementById('otpBox').style.display = "block";
-                    } else {
-                        alert("❌ Failed to send OTP! Make sure you started the Bot (@Kumarotpbot) first.");
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("❌ Network Error! Check your internet connection.");
-                } finally {
-                    btn.innerText = "📩 2. SEND OTP";
-                }
-            }
-        }
-
-        // OTP तपासणारे आणि अकाउंट बनवणारे फंक्शन
-        function registerUser() {
-            let enteredOtp = document.getElementById('regOtpInput').value.trim();
-            
-            if(enteredOtp === "") {
-                return alert("⚠️ Please enter the OTP!");
-            }
-
-            if(enteredOtp === generatedOTP) {
-                let name = document.getElementById('regName').value.trim();
-                let pass = document.getElementById('regPass').value.trim();
-                let tgId = document.getElementById('regTgId').value.trim();
-
-                // 🟢 लेटेस्ट डेटाबेस घेणे 
-                let currentDB = JSON.parse(localStorage.getItem("allGameUsers")) || {};
-
-                // नवीन युझरची माहिती डेटाबेसमध्ये सेव्ह करणे
-                currentDB[tgId] = {
-                    name: name,
-                    password: pass,
-                    coins: 0 // नवीन अकाउंटला 0 कॉइन्स मिळतील
-                };
-
-                // डेटाबेस अपडेट करणे
-                localStorage.setItem("allGameUsers", JSON.stringify(currentDB));
-                
-                alert("🎉 Registration Successful! Please Login.");
-                document.getElementById('otpBox').style.display = "none";
-                
-                // रजिस्ट्रेशन झाल्यावर थेट Login पेजवर पाठवणे
-                showScreen('loginScreen');
-            } else {
-                alert("❌ Incorrect OTP! Please try again.");
-            }
-        }
-    </script>
-</div>
     
      <!-- 3. FORGOT PASSWORD -->
     <div class="container screen" id="forgotPassScreen">
@@ -699,9 +592,114 @@
 
         function createGuild() { if(user.coins < 100) return alert("Need 100 Coins!"); let name = document.getElementById('createGuildName').value.trim(); if(!name || name.length < 3) return alert("Min 3 chars"); db.ref('guilds/' + name).once('value', s => { if(s.exists()) return alert("Guild exists!"); user.coins -= 100; user.guild = name; saveUserToDatabase(); let gData = { leader: user.tgId, totalCoins: user.coins, members: {} }; gData.members[user.tgId] = true; db.ref('guilds/' + name).set(gData); alert("✅ Created!"); openGuilds(); }); }
         function joinGuild() { let name = document.getElementById('joinGuildName').value.trim(); if(!name) return; db.ref('guilds/' + name).once('value', s => { if(!s.exists()) return alert("Guild not found!"); let g = s.val(); if(Object.keys(g.members).length >= 10) return alert("Guild is Full!"); user.guild = name; saveUserToDatabase(); g.members[user.tgId] = true; g.totalCoins += user.coins; db.ref('guilds/' + name).update({ members: g.members, totalCoins: g.totalCoins }); alert("✅ Joined!"); openGuilds(); }); }
-        function leaveGuild() { if(!user.guild) return; let gName = user.guild; user.guild = ""; saveUserToDatabase(); db.ref('guilds/' + gName).once('value', s => { if(s.exists()) { let g = s.val(); delete g.members[user.tgId]; g.totalCoins -= user.coins; if(Object.keys(g.members).length === 0) db.ref('guilds/' + gName).remove(); else db.ref('guilds/' + gName).update({ members: g.members, totalCoins: g.totalCoins }); } }); openGuilds(); }
-
+        function leaveGuild() { if(!user.guild) return; let gName = user.guild; user.guild = ""; saveUserToDatabase(); db.ref('guilds/' + gName).once('value', s => { if(s.exists()) { let g = s.val(); delete g.members[user.tgId]; g.totalCoins -= user.coins; if(Object.keys(g.members).length === 0) db.ref('guilds/' + gName).remove(); else db.ref('guilds/' + gName).update({ members: g.members, totalCoins: g.totalCoins }); } }); openGuilds(); 
         function adminAction(type) { if (user.tgId !== ADMIN_TG_ID) return; if (type === 'ban' || type === 'unban') { let id = document.getElementById('admBanId').value; if(id) { db.ref('users/' + id).update({ isBanned: (type === 'ban') }); alert(`User ${type}ned!`); document.getElementById('admBanId').value=""; } } if (type === 'coins') { let id = document.getElementById('admId').value, amt = parseInt(document.getElementById('admCoins').value); if (id && !isNaN(amt)) db.ref('users/' + id).once('value', s => { if (s.exists()) { let c = parseInt(s.val().coins) || 0; db.ref('users/' + id).update({ coins: c + amt }); alert(`Success!`); } }); } }
+
+        // ==========================================
+        // 🔐 REGISTRATION & OTP LOGIC
+        // ==========================================
+        let generatedOTP = ""; // OTP सेव्ह ठेवण्यासाठी
+
+async function sendOTP(actionType) {
+    if (actionType === 'register') {
+        let name = document.getElementById('regName').value.trim();
+        let pass = document.getElementById('regPass').value.trim();
+        let tgId = document.getElementById('regTgId').value.trim();
+
+        // १. माहिती रिकामी तर नाही ना हे चेक करणे
+        if (name === "" || pass === "" || tgId === "") {
+            return alert("⚠️ Please fill all details first!");
+        }
+
+        // २. रियल-टाईम डेटाबेस चेक करणे 
+        let currentDB = JSON.parse(localStorage.getItem("allGameUsers")) || {};
+
+        // ३. अकाउंट आधीच आहे का ते चेक करणे
+        if (currentDB[tgId]) {
+            alert("⚠️ ACCOUNT ALREADY EXISTS!\nया टेलिग्राम आयडीवर आधीच अकाउंट आहे. कृपया लॉगीन करा.");
+            showScreen('loginScreen'); 
+            return; // इथूनच कोड परत फिरेल, OTP जाणार नाही!
+        }
+
+        // ४. 4-अंकी रँडम OTP तयार करणे
+        generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+        // टोकन चेक करणे 
+        if (typeof botToken === 'undefined' || !botToken) {
+            alert("❌ Error: Bot Token is missing in the code!");
+            return;
+        }
+
+        const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+        let messageText = `🔐 *KUMAR GAME OTP*\n\nHello ${name},\nYour verification code is: *${generatedOTP}*\n\nDo not share this code with anyone.`;
+
+        let btn = document.getElementById('sendOtpBtn');
+        btn.innerText = "⏳ Sending...";
+
+        try {
+            let response = await fetch(telegramApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: tgId,
+                    text: messageText,
+                    parse_mode: "Markdown"
+                })
+            });
+
+            let data = await response.json();
+
+            if (data.ok) {
+                alert("✅ OTP successfully sent to your Telegram Chat ID!");
+                document.getElementById('otpBox').style.display = "block";
+            } else {
+                alert("❌ Failed to send OTP! Make sure you started the Bot (@Kumarotpbot) first.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("❌ Network Error! Check your internet connection.");
+        } finally {
+            btn.innerText = "📩 2. SEND OTP";
+        }
+    }
+}
+
+function registerUser() {
+    let enteredOtp = document.getElementById('regOtpInput').value.trim();
+    
+    if(enteredOtp === "") {
+        return alert("⚠️ Please enter the OTP!");
+    }
+
+    if(enteredOtp === generatedOTP) {
+        let name = document.getElementById('regName').value.trim();
+        let pass = document.getElementById('regPass').value.trim();
+        let tgId = document.getElementById('regTgId').value.trim();
+
+        // लेटेस्ट डेटाबेस घेणे 
+        let currentDB = JSON.parse(localStorage.getItem("allGameUsers")) || {};
+
+        // नवीन युझरची माहिती डेटाबेसमध्ये सेव्ह करणे
+        currentDB[tgId] = {
+            name: name,
+            password: pass,
+            coins: 0 // नवीन अकाउंटला 0 कॉइन्स मिळतील
+        };
+
+        // डेटाबेस अपडेट करणे
+        localStorage.setItem("allGameUsers", JSON.stringify(currentDB));
+        
+        alert("🎉 Registration Successful! Please Login.");
+        document.getElementById('otpBox').style.display = "none";
+        document.getElementById('regOtpInput').value = ""; // बॉक्स रिकामा करणे
+        
+        // रजिस्ट्रेशन झाल्यावर थेट Login पेजवर पाठवणे
+        showScreen('loginScreen');
+    } else {
+        alert("❌ Incorrect OTP! Please try again.");
+    }
+            }
+    
         // Global database (to store generated codes)
 window.generatedGameCodes = {};
 
