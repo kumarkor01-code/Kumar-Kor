@@ -687,7 +687,9 @@ function aiMoveOX() {
         const oxWinLines = [[0,1,2,'line-row-0'], [3,4,5,'line-row-1'], [6,7,8,'line-row-2'], [0,3,6,'line-col-0'], [1,4,7,'line-col-1'], [2,5,8,'line-col-2'], [0,4,8,'line-diag-0'], [2,4,6,'line-diag-1']];
         function checkWinnerOnly(b) { for (let [x, y, z] of oxWinLines) { if (b[x] && b[x] === b[y] && b[x] === b[z]) return b[x]; } return null; }
 
-    function checkWinOX() { 
+     ["", "", "", "", "", "", "", "", ""]; oxHistory = []; oxActive = true; oxAiThinking = false; document.getElementById('winLine').style.display = "none"; document.getElementById('oxPlayAgain').style.display = "none"; document.getElementById('oxStatus').innerText = "YOUR TURN (⭕)"; document.getElementById('oxStatus').style.color = "var(--success)"; drawOX(); }
+
+     function checkWinOX() { 
     let w = checkWinnerOnly(oxBoard); 
     if (w) { 
         oxActive = false; 
@@ -700,15 +702,15 @@ function aiMoveOX() {
         } 
         
         if (w === "X") { 
-            user.coins+=10; 
+            user.coins += 10; 
             user.history.w++; 
             document.getElementById('oxStatus').innerHTML = "🎉 YOU WIN! +10 COIN"; 
             document.getElementById('oxStatus').style.color = "var(--success)"; 
             
-            // 🟢 जिंकल्यावर अर्ध्या सेकंदाने कोड स्क्रीनवर येईल आणि कॉपी करता येईल
+            // 🟢 जिंकल्यावर आपला नवीन भारी पॉपअप येईल
             setTimeout(() => {
                 let winCode = generateWinLossCode('OX', 'Win');
-                prompt("🎉 YOU WON! Copy your code below:", winCode);
+                showGameCodePopup("🎉 YOU WON!", winCode, "#10b981");
             }, 500);
 
         } else { 
@@ -716,10 +718,10 @@ function aiMoveOX() {
             document.getElementById('oxStatus').innerHTML = "💀 DEFEAT!"; 
             document.getElementById('oxStatus').style.color = "var(--danger)"; 
             
-            // 🔴 हरल्यावर अर्ध्या सेकंदाने कोड स्क्रीनवर येईल
+            // 🔴 हरल्यावर आपला नवीन भारी पॉपअप येईल
             setTimeout(() => {
                 let lossCode = generateWinLossCode('OX', 'Loss');
-                prompt("💀 DEFEAT! Copy your code below:", lossCode);
+                showGameCodePopup("💀 DEFEAT!", lossCode, "#ef4444");
             }, 500);
         } 
         
@@ -741,9 +743,8 @@ function aiMoveOX() {
     document.getElementById('oxStatus').innerText = "YOUR TURN (🥳)"; 
     document.getElementById('oxStatus').style.color = "var(--success)"; 
     return false; 
-}
-        function resetOXGame() { oxBoard = ["", "", "", "", "", "", "", "", ""]; oxHistory = []; oxActive = true; oxAiThinking = false; document.getElementById('winLine').style.display = "none"; document.getElementById('oxPlayAgain').style.display = "none"; document.getElementById('oxStatus').innerText = "YOUR TURN (⭕)"; document.getElementById('oxStatus').style.color = "var(--success)"; drawOX(); }
-                                                                                                                                                                     
+     }
+        
         // 🔲 DOTS & BOXES GAME
         let hLines = [], vLines = [], boxes = [], dbActive = false, dbAiThinking = false, p1Score = 0, aiScore = 0;
         function startDotsGame() { showScreen('dotsScreen'); initDotsGame(); document.getElementById('dotsCoinDisp').innerText = user.coins; }
