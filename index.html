@@ -643,6 +643,39 @@ function verifyGameCode() {
     }
 }
         
+        // (तुझ्याकडे युझर्सचा जो डेटाबेस असेल, तो इथे गृहीत धरला आहे. उदा. localStorage)
+        let usersDatabase = JSON.parse(localStorage.getItem("allGameUsers")) || {};
+
+        function sendOTP(actionType) {
+        if (actionType === 'register') {
+        let name = document.getElementById('regName').value.trim();
+        let pass = document.getElementById('regPass').value.trim();
+        let tgId = document.getElementById('regTgId').value.trim();
+
+        // १. माहिती रिकामी तर नाही ना हे चेक करणे
+        if (name === "" || pass === "" || tgId === "") {
+            return alert("⚠️ Please fill all details first!");
+        }
+
+        // 🔴 २. मेन लॉजिक: अकाउंट आधीच आहे का ते चेक करणे
+        // जर युझर्सच्या डेटाबेसमध्ये हा Telegram ID आधीच सेव्ह असेल...
+        if (usersDatabase[tgId]) {
+            alert("⚠️ ACCOUNT ALREADY EXISTS!\nया टेलिग्राम आयडीवर आधीच अकाउंट आहे. कृपया लॉगीन करा.");
+            
+            // युझरला थेट लॉगीन पेजवर पाठवणे
+            showScreen('loginScreen'); 
+            
+            return; // इथूनच कोड थांबेल, म्हणजे OTP जाणार नाही!
+        }
+
+        // ३. जर अकाउंट नसेल, तरच OTP पाठवणे
+        alert("✅ OTP Sent successfully to your Telegram Bot!");
+        document.getElementById('otpBox').style.display = "block";
+        
+        // (इथे तुझा OTP सेंड करण्याचा मूळ टेलिग्राम बॉटचा API कोड असेल, तो तसाच राहू दे)
+    }
+}
+        
         // ==========================================================================
         // 🟢 GAMES: OX, DOTS, MEMORY
         // ==========================================================================
