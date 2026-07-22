@@ -601,7 +601,8 @@ window.generatedGameCodes = {};
         // 1. Function to generate a code (to be called when a game ends)
         function generateWinLossCode(gameName, status) {
         // Generate a random 8-character string (e.g., jwhxvsksn)
-        let randomString = Math.random().toString(36).substring(2, 10);         let finalCode = `${gameName} ${randomString}`;
+        let randomString = Math.random().toString(36).substring(2, 10);         
+        let finalCode = `${gameName} ${randomString}`;
             
     // Save the code data for the admin to verify
     window.generatedGameCodes[finalCode] = {
