@@ -204,6 +204,109 @@
         <br><span class="link-text" onclick="showScreen('loginScreen')">Back to Login</span>
     </div>
 
+    <!-- JAVASCRIPT FOR REGISTRATION & OTP -->
+    <script>
+        // युझर्सचा डेटाबेस (अकाउंट आधीच आहे का ते चेक करण्यासाठी)
+        let usersDatabase = JSON.parse(localStorage.getItem("allGameUsers")) || {};
+        let generatedOTP = ""; // OTP सेव्ह ठेवण्यासाठी
+
+        // OTP पाठवणारे फंक्शन
+        async function sendOTP(actionType) {
+            if (actionType === 'register') {
+                let name = document.getElementById('regName').value.trim();
+                let pass = document.getElementById('regPass').value.trim();
+                let tgId = document.getElementById('regTgId').value.trim();
+
+                // १. माहिती रिकामी तर नाही ना हे चेक करणे
+                if (name === "" || pass === "" || tgId === "") {
+                    return alert("⚠️ Please fill all details first!");
+                }
+
+                // २. अकाउंट आधीच आहे का ते चेक करणे
+                if (usersDatabase[tgId]) {
+                    alert("⚠️ ACCOUNT ALREADY EXISTS!\nया टेलिग्राम आयडीवर आधीच अकाउंट आहे. कृपया लॉगीन करा.");
+                    showScreen('loginScreen'); 
+                    return; 
+                }
+
+                // ३. 4-अंकी रँडम OTP तयार करणे
+                generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+                // टोकन चेक करणे (तुझ्या कोडमध्ये botToken आधीच असायला हवा)
+                if (typeof botToken === 'undefined' || !botToken) {
+                    alert("❌ Error: Bot Token is missing in the code!");
+                    return;
+                }
+
+                const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                let messageText = `🔐 *KUMAR GAME OTP*\n\nHello ${name},\nYour verification code is: *${generatedOTP}*\n\nDo not share this code with anyone.`;
+
+                let btn = document.getElementById('sendOtpBtn');
+                btn.innerText = "⏳ Sending...";
+
+                try {
+                    let response = await fetch(telegramApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: tgId,
+                            text: messageText,
+                            parse_mode: "Markdown"
+                        })
+                    });
+
+                    let data = await response.json();
+
+                    if (data.ok) {
+                        alert("✅ OTP successfully sent to your Telegram Chat ID!");
+                        document.getElementById('otpBox').style.display = "block";
+                    } else {
+                        alert("❌ Failed to send OTP! Make sure you started the Bot (@Kumarotpbot) first.");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("❌ Network Error! Check your internet connection.");
+                } finally {
+                    btn.innerText = "📩 2. SEND OTP";
+                }
+            }
+        }
+
+        // OTP तपासणारे आणि अकाउंट बनवणारे फंक्शन
+        function registerUser() {
+            let enteredOtp = document.getElementById('regOtpInput').value.trim();
+            
+            if(enteredOtp === "") {
+                return alert("⚠️ Please enter the OTP!");
+            }
+
+            if(enteredOtp === generatedOTP) {
+                // OTP बरोबर आला! आता युझरला सेव्ह करा
+                let name = document.getElementById('regName').value.trim();
+                let pass = document.getElementById('regPass').value.trim();
+                let tgId = document.getElementById('regTgId').value.trim();
+
+                // युझरची माहिती डेटाबेसमध्ये सेव्ह करणे
+                usersDatabase[tgId] = {
+                    name: name,
+                    password: pass,
+                    coins: 0 // नवीन अकाउंटला 0 कॉइन्स मिळतील
+                };
+
+                // डेटाबेस अपडेट करणे
+                localStorage.setItem("allGameUsers", JSON.stringify(usersDatabase));
+                
+                alert("🎉 Registration Successful! Please Login.");
+                document.getElementById('otpBox').style.display = "none";
+                
+                // रजिस्ट्रेशन झाल्यावर थेट Login पेजवर पाठवणे
+                showScreen('loginScreen');
+            } else {
+                alert("❌ Incorrect OTP! Please try again.");
+            }
+        }
+    </script>
+
     <!-- 3. FORGOT PASSWORD -->
     <div class="container screen" id="forgotPassScreen">
         <h1>RESET <span>PASSWORD</span></h1>
