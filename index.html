@@ -206,8 +206,6 @@
 
     <!-- JAVASCRIPT FOR REGISTRATION & OTP -->
     <script>
-        // युझर्सचा डेटाबेस (अकाउंट आधीच आहे का ते चेक करण्यासाठी)
-        let usersDatabase = JSON.parse(localStorage.getItem("allGameUsers")) || {};
         let generatedOTP = ""; // OTP सेव्ह ठेवण्यासाठी
 
         // OTP पाठवणारे फंक्शन
@@ -222,14 +220,17 @@
                     return alert("⚠️ Please fill all details first!");
                 }
 
-                // २. अकाउंट आधीच आहे का ते चेक करणे
-                if (usersDatabase[tgId]) {
+                // 🟢 २. रियल-टाईम डेटाबेस चेक करणे (बटण दाबल्यावर लगेच लेटेस्ट डेटा घेणार)
+                let currentDB = JSON.parse(localStorage.getItem("allGameUsers")) || {};
+
+                // ३. अकाउंट आधीच आहे का ते चेक करणे
+                if (currentDB[tgId]) {
                     alert("⚠️ ACCOUNT ALREADY EXISTS!\nया टेलिग्राम आयडीवर आधीच अकाउंट आहे. कृपया लॉगीन करा.");
                     showScreen('loginScreen'); 
-                    return; 
+                    return; // इथूनच कोड परत फिरेल, OTP जाणार नाही!
                 }
 
-                // ३. 4-अंकी रँडम OTP तयार करणे
+                // ४. 4-अंकी रँडम OTP तयार करणे
                 generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
                 // टोकन चेक करणे (तुझ्या कोडमध्ये botToken आधीच असायला हवा)
@@ -281,20 +282,22 @@
             }
 
             if(enteredOtp === generatedOTP) {
-                // OTP बरोबर आला! आता युझरला सेव्ह करा
                 let name = document.getElementById('regName').value.trim();
                 let pass = document.getElementById('regPass').value.trim();
                 let tgId = document.getElementById('regTgId').value.trim();
 
-                // युझरची माहिती डेटाबेसमध्ये सेव्ह करणे
-                usersDatabase[tgId] = {
+                // 🟢 लेटेस्ट डेटाबेस घेणे 
+                let currentDB = JSON.parse(localStorage.getItem("allGameUsers")) || {};
+
+                // नवीन युझरची माहिती डेटाबेसमध्ये सेव्ह करणे
+                currentDB[tgId] = {
                     name: name,
                     password: pass,
                     coins: 0 // नवीन अकाउंटला 0 कॉइन्स मिळतील
                 };
 
                 // डेटाबेस अपडेट करणे
-                localStorage.setItem("allGameUsers", JSON.stringify(usersDatabase));
+                localStorage.setItem("allGameUsers", JSON.stringify(currentDB));
                 
                 alert("🎉 Registration Successful! Please Login.");
                 document.getElementById('otpBox').style.display = "none";
@@ -305,9 +308,9 @@
                 alert("❌ Incorrect OTP! Please try again.");
             }
         }
-    </script>
-
-    <!-- 3. FORGOT PASSWORD -->
+</script>
+    
+     <!-- 3. FORGOT PASSWORD -->
     <div class="container screen" id="forgotPassScreen">
         <h1>RESET <span>PASSWORD</span></h1>
         <p class="subtitle">Your data is 100% safe!</p>
