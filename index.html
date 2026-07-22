@@ -597,16 +597,16 @@
         function adminAction(type) { if (user.tgId !== ADMIN_TG_ID) return; if (type === 'ban' || type === 'unban') { let id = document.getElementById('admBanId').value; if(id) { db.ref('users/' + id).update({ isBanned: (type === 'ban') }); alert(`User ${type}ned!`); document.getElementById('admBanId').value=""; } } if (type === 'coins') { let id = document.getElementById('admId').value, amt = parseInt(document.getElementById('admCoins').value); if (id && !isNaN(amt)) db.ref('users/' + id).once('value', s => { if (s.exists()) { let c = parseInt(s.val().coins) || 0; db.ref('users/' + id).update({ coins: c + amt }); alert(`Success!`); } }); } }
 
         // Global database (to store generated codes)
-window.generatedGameCodes = {};
+        window.generatedGameCodes = {};
 
-// 1. Function to generate a code (to be called when a game ends)
-function generateWinLossCode(gameName, status) {
-    // Generate a random 8-character string (e.g., jwhxvsksn)
-    let randomString = Math.random().toString(36).substring(2, 10);
-    let finalCode = `${gameName} ${randomString}`;
+        // 1. Function to generate a code (to be called when a game ends)
+        function generateWinLossCode(gameName, status) {
+        // Generate a random 8-character string (e.g., jwhxvsksn)
+        let randomString = Math.random().toString(36).substring(2, 10);
+        let finalCode = `${gameName} ${randomString}`;
     
-    // Save the code data for the admin to verify
-    window.generatedGameCodes[finalCode] = {
+        // Save the code data for the admin to verify
+        window.generatedGameCodes[finalCode] = {
         game: gameName,
         status: status, // 'Win' or 'Loss'
         time: new Date().toLocaleTimeString()
@@ -615,10 +615,10 @@ function generateWinLossCode(gameName, status) {
     return finalCode;
 }
 
-// 2. Function to verify the code from the admin panel
-function verifyGameCode() {
-    let inputCode = document.getElementById('admVerifyCode').value.trim();
-    let resultEl = document.getElementById('verifyResult');
+        // 2. Function to verify the code from the admin panel
+        function verifyGameCode() {
+        let inputCode = document.getElementById('admVerifyCode').value.trim();
+        let resultEl = document.getElementById('verifyResult');
     
     if (inputCode === "") {
         resultEl.style.color = "orange";
@@ -642,9 +642,6 @@ function verifyGameCode() {
         resultEl.innerText = `⚠️ FAKE OR INVALID CODE!`;
     }
 }
-        
-        // (तुझ्याकडे युझर्सचा डेटाबेस localStorage मध्ये असेल)
-let user
         
         // ==========================================================================
         // 🟢 GAMES: OX, DOTS, MEMORY
